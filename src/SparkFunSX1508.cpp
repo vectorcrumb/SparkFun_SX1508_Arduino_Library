@@ -24,8 +24,8 @@ Distributed as-is; no warranty is given.
 
 #include <Wire.h>
 #include "Arduino.h"
-#include "SparkFunSX1509.h"
-#include "util/sx1509_registers.h"
+#include "SparkFunSX1508.h"
+#include "util/sx1508_registers.h"
 
 SX1508::SX1508()
 {
