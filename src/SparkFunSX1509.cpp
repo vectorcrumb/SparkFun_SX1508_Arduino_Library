@@ -1,20 +1,20 @@
 /******************************************************************************
-SparkFunSX1509.cpp
-SparkFun SX1509 I/O Expander Library Source File
+SparkFunSX1508.cpp
+SparkFun SX1508 I/O Expander Library Source File
 Jim Lindblom @ SparkFun Electronics
 Original Creation Date: September 21, 2015
 https://github.com/sparkfun/SparkFun_SX1509_Arduino_Library
 
-Here you'll find the Arduino code used to interface with the SX1509 I2C
+Here you'll find the Arduino code used to interface with the SX1508 I2C
 16 I/O expander. There are functions to take advantage of everything the
-SX1509 provides - input/output setting, writing pins high/low, reading 
+SX1508 provides - input/output setting, writing pins high/low, reading
 the input value of pins, LED driver utilities (blink, breath, pwm), and
 keypad engine utilites.
 
 Development environment specifics:
 	IDE: Arduino 1.6.5
 	Hardware Platform: Arduino Uno
-	SX1509 Breakout Version: v2.0
+	SX1508 Breakout Version: v2.0
 
 This code is beerware; if you see me (or any other SparkFun employee) at the
 local, and you've found our code helpful, please buy us a round!
@@ -27,12 +27,12 @@ Distributed as-is; no warranty is given.
 #include "SparkFunSX1509.h"
 #include "util/sx1509_registers.h"
 
-SX1509::SX1509()
+SX1508::SX1508()
 {
 	_clkX = 0;
 }
 
-SX1509::SX1509(uint8_t address, uint8_t resetPin, uint8_t interruptPin, uint8_t oscillatorPin)
+SX1508::SX1508(uint8_t address, uint8_t resetPin, uint8_t interruptPin, uint8_t oscillatorPin)
 {
 	// Store the received parameters into member variables
 	deviceAddress = address;
@@ -41,7 +41,7 @@ SX1509::SX1509(uint8_t address, uint8_t resetPin, uint8_t interruptPin, uint8_t 
 	pinReset = resetPin;
 }
 
-uint8_t SX1509::begin(uint8_t address, TwoWire &wirePort, uint8_t resetPin)
+uint8_t SX1508::begin(uint8_t address, TwoWire &wirePort, uint8_t resetPin)
 {
 	// Store the received parameters into member variables
 	_i2cPort = &wirePort;
@@ -51,10 +51,10 @@ uint8_t SX1509::begin(uint8_t address, TwoWire &wirePort, uint8_t resetPin)
 	return init();
 }
 
-uint8_t SX1509::init(void)
+uint8_t SX1508::init(void)
 {
-	// Begin I2C should be done externally, before beginning SX1509
-	//Wire.begin();
+	// Begin I2C should be done externally, before beginning SX1508
+	// Wire.begin();
 
 	// If the reset pin is connected
 	if (pinReset != 255)
@@ -79,7 +79,7 @@ uint8_t SX1509::init(void)
 	return 0;
 }
 
-void SX1509::reset(bool hardware)
+void SX1508::reset(bool hardware)
 {
 	// if hardware bool is set
 	if (hardware)
@@ -92,10 +92,10 @@ void SX1509::reset(bool hardware)
 			regMisc &= ~(1 << 2);
 			writeByte(REG_MISC, regMisc);
 		}
-		// Reset the SX1509, the pin is active low
-		::pinMode(pinReset, OUTPUT);	  // set reset pin as output
-		::digitalWrite(pinReset, LOW);  // pull reset pin low
-		delay(1);					  // Wait for the pin to settle
+		// Reset the SX1508, the pin is active low
+		::pinMode(pinReset, OUTPUT);	// set reset pin as output
+		::digitalWrite(pinReset, LOW);	// pull reset pin low
+		delay(1);						// Wait for the pin to settle
 		::digitalWrite(pinReset, HIGH); // pull reset pin back high
 	}
 	else
@@ -106,9 +106,9 @@ void SX1509::reset(bool hardware)
 	}
 }
 
-void SX1509::pinDir(uint8_t pin, uint8_t inOut, uint8_t initialLevel)
+void SX1508::pinDir(uint8_t pin, uint8_t inOut, uint8_t initialLevel)
 {
-	// The SX1509 RegDir registers: REG_DIR_B, REG_DIR_A
+	// The SX1508 RegDir registers: REG_DIR_B, REG_DIR_A
 	//	0: IO is configured as an output
 	//	1: IO is configured as an input
 	uint8_t modeBit;
@@ -145,12 +145,12 @@ void SX1509::pinDir(uint8_t pin, uint8_t inOut, uint8_t initialLevel)
 	}
 }
 
-void SX1509::pinMode(uint8_t pin, uint8_t inOut, uint8_t initialLevel)
+void SX1508::pinMode(uint8_t pin, uint8_t inOut, uint8_t initialLevel)
 {
 	pinDir(pin, inOut, initialLevel);
 }
 
-bool SX1509::writePin(uint8_t pin, uint8_t highLow)
+bool SX1508::writePin(uint8_t pin, uint8_t highLow)
 {
 
 	uint16_t tempRegDir = readWord(REG_DIR_B);
@@ -184,12 +184,12 @@ bool SX1509::writePin(uint8_t pin, uint8_t highLow)
 	}
 }
 
-bool SX1509::digitalWrite(uint8_t pin, uint8_t highLow)
+bool SX1508::digitalWrite(uint8_t pin, uint8_t highLow)
 {
 	return writePin(pin, highLow);
 }
 
-uint8_t SX1509::readPin(uint8_t pin)
+uint8_t SX1508::readPin(uint8_t pin)
 {
 	uint16_t tempRegDir = readWord(REG_DIR_B);
 
@@ -207,7 +207,7 @@ uint8_t SX1509::readPin(uint8_t pin)
 	return 0;
 }
 
-bool SX1509::readPin(const uint8_t pin, bool *value)
+bool SX1508::readPin(const uint8_t pin, bool *value)
 {
 	uint16_t tempRegDir;
 	if (readWord(REG_DIR_B, &tempRegDir))
@@ -230,17 +230,17 @@ bool SX1509::readPin(const uint8_t pin, bool *value)
 	return false;
 }
 
-uint8_t SX1509::digitalRead(uint8_t pin)
+uint8_t SX1508::digitalRead(uint8_t pin)
 {
 	return readPin(pin);
 }
 
-bool SX1509::digitalRead(uint8_t pin, bool *value)
+bool SX1508::digitalRead(uint8_t pin, bool *value)
 {
 	return readPin(pin, value);
 }
 
-void SX1509::ledDriverInit(uint8_t pin, uint8_t freq /*= 1*/, bool log /*= false*/)
+void SX1508::ledDriverInit(uint8_t pin, uint8_t freq /*= 1*/, bool log /*= false*/)
 {
 	uint16_t tempWord;
 	uint8_t tempByte;
@@ -291,7 +291,7 @@ void SX1509::ledDriverInit(uint8_t pin, uint8_t freq /*= 1*/, bool log /*= false
 		// tempByte |= freq;
 	}
 
-	freq = (freq & 0x7) << 4;	// mask only 3 bits and shift to bit position 6:4 
+	freq = (freq & 0x7) << 4; // mask only 3 bits and shift to bit position 6:4
 	tempByte |= freq;
 
 	writeByte(REG_MISC, tempByte);
@@ -307,7 +307,7 @@ void SX1509::ledDriverInit(uint8_t pin, uint8_t freq /*= 1*/, bool log /*= false
 	writeWord(REG_DATA_B, tempWord);
 }
 
-void SX1509::pwm(uint8_t pin, uint8_t iOn)
+void SX1508::pwm(uint8_t pin, uint8_t iOn)
 {
 	// Write the on intensity of pin
 	// Linear mode: Ion = iOn
@@ -315,12 +315,12 @@ void SX1509::pwm(uint8_t pin, uint8_t iOn)
 	writeByte(REG_I_ON[pin], iOn);
 }
 
-void SX1509::analogWrite(uint8_t pin, uint8_t iOn)
+void SX1508::analogWrite(uint8_t pin, uint8_t iOn)
 {
 	pwm(pin, iOn);
 }
 
-void SX1509::blink(uint8_t pin, unsigned long tOn, unsigned long tOff, uint8_t onIntensity, uint8_t offIntensity)
+void SX1508::blink(uint8_t pin, unsigned long tOn, unsigned long tOff, uint8_t onIntensity, uint8_t offIntensity)
 {
 	uint8_t onReg = calculateLEDTRegister(tOn);
 	uint8_t offReg = calculateLEDTRegister(tOff);
@@ -328,7 +328,7 @@ void SX1509::blink(uint8_t pin, unsigned long tOn, unsigned long tOff, uint8_t o
 	setupBlink(pin, onReg, offReg, onIntensity, offIntensity, 0, 0);
 }
 
-void SX1509::breathe(uint8_t pin, unsigned long tOn, unsigned long tOff, unsigned long rise, unsigned long fall, uint8_t onInt, uint8_t offInt, bool log)
+void SX1508::breathe(uint8_t pin, unsigned long tOn, unsigned long tOff, unsigned long rise, unsigned long fall, uint8_t onInt, uint8_t offInt, bool log)
 {
 	offInt = constrain(offInt, 0, 7);
 
@@ -341,7 +341,7 @@ void SX1509::breathe(uint8_t pin, unsigned long tOn, unsigned long tOff, unsigne
 	setupBlink(pin, onReg, offReg, onInt, offInt, riseTime, fallTime, log);
 }
 
-void SX1509::setupBlink(uint8_t pin, uint8_t tOn, uint8_t tOff, uint8_t onIntensity, uint8_t offIntensity, uint8_t tRise, uint8_t tFall, bool log)
+void SX1508::setupBlink(uint8_t pin, uint8_t tOn, uint8_t tOff, uint8_t onIntensity, uint8_t offIntensity, uint8_t tRise, uint8_t tFall, bool log)
 {
 	ledDriverInit(pin, log);
 
@@ -382,7 +382,7 @@ void SX1509::setupBlink(uint8_t pin, uint8_t tOn, uint8_t tOff, uint8_t onIntens
 		writeByte(REG_T_FALL[pin], tFall);
 }
 
-void SX1509::keypad(uint8_t rows, uint8_t columns, uint16_t sleepTime, uint8_t scanTime, uint8_t debounceTime)
+void SX1508::keypad(uint8_t rows, uint8_t columns, uint16_t sleepTime, uint8_t scanTime, uint8_t debounceTime)
 {
 	uint16_t tempWord;
 	uint8_t tempByte;
@@ -455,23 +455,23 @@ void SX1509::keypad(uint8_t rows, uint8_t columns, uint16_t sleepTime, uint8_t s
 	tempByte = sleepTime | scanTimeBits;
 	writeByte(REG_KEY_CONFIG_1, tempByte);
 
-	// RegKeyConfig2 tells the SX1509 how many rows and columns we've got going
+	// RegKeyConfig2 tells the SX1508 how many rows and columns we've got going
 	rows = (rows - 1) & 0b111;		 // 0 = off, 0b001 = 2 rows, 0b111 = 8 rows, etc.
 	columns = (columns - 1) & 0b111; // 0b000 = 1 column, ob111 = 8 columns, etc.
 	writeByte(REG_KEY_CONFIG_2, (rows << 3) | columns);
 }
 
-uint16_t SX1509::readKeypad()
+uint16_t SX1508::readKeypad()
 {
 	return readKeyData();
 }
 
-uint16_t SX1509::readKeyData()
+uint16_t SX1508::readKeyData()
 {
 	return (0xFFFF ^ readWord(REG_KEY_DATA_1));
 }
 
-uint8_t SX1509::getRow(uint16_t keyData)
+uint8_t SX1508::getRow(uint16_t keyData)
 {
 	uint8_t rowData = uint8_t(keyData & 0x00FF);
 
@@ -483,7 +483,7 @@ uint8_t SX1509::getRow(uint16_t keyData)
 	return 0;
 }
 
-uint8_t SX1509::getCol(uint16_t keyData)
+uint8_t SX1508::getCol(uint16_t keyData)
 {
 	uint8_t colData = uint8_t((keyData & 0xFF00) >> 8);
 
@@ -495,7 +495,7 @@ uint8_t SX1509::getCol(uint16_t keyData)
 	return 0;
 }
 
-void SX1509::sync(void)
+void SX1508::sync(void)
 {
 	// First check if nReset functionality is set
 	uint8_t regMisc = readByte(REG_MISC);
@@ -506,16 +506,16 @@ void SX1509::sync(void)
 	}
 
 	// Toggle nReset pin to sync LED timers
-	::pinMode(pinReset, OUTPUT);	  // set reset pin as output
-	::digitalWrite(pinReset, LOW);  // pull reset pin low
-	delay(1);					  // Wait for the pin to settle
+	::pinMode(pinReset, OUTPUT);	// set reset pin as output
+	::digitalWrite(pinReset, LOW);	// pull reset pin low
+	delay(1);						// Wait for the pin to settle
 	::digitalWrite(pinReset, HIGH); // pull reset pin back high
 
 	// Return nReset to POR functionality
 	writeByte(REG_MISC, (regMisc & ~(1 << 2)));
 }
 
-void SX1509::debounceConfig(uint8_t configValue)
+void SX1508::debounceConfig(uint8_t configValue)
 {
 	// First make sure clock is configured
 	uint8_t tempByte = readByte(REG_MISC);
@@ -535,7 +535,7 @@ void SX1509::debounceConfig(uint8_t configValue)
 	writeByte(REG_DEBOUNCE_CONFIG, configValue);
 }
 
-void SX1509::debounceTime(uint8_t time)
+void SX1508::debounceTime(uint8_t time)
 {
 	if (_clkX == 0)					   // If clock hasn't been set up.
 		clock(INTERNAL_CLOCK_2MHZ, 1); // Set clock to 2MHz.
@@ -562,19 +562,19 @@ void SX1509::debounceTime(uint8_t time)
 	debounceConfig(configValue);
 }
 
-void SX1509::debounceEnable(uint8_t pin)
+void SX1508::debounceEnable(uint8_t pin)
 {
 	uint16_t debounceEnable = readWord(REG_DEBOUNCE_ENABLE_B);
 	debounceEnable |= (1 << pin);
 	writeWord(REG_DEBOUNCE_ENABLE_B, debounceEnable);
 }
 
-void SX1509::debouncePin(uint8_t pin)
+void SX1508::debouncePin(uint8_t pin)
 {
 	debounceEnable(pin);
 }
 
-void SX1509::debounceKeypad(uint8_t time, uint8_t numRows, uint8_t numCols)
+void SX1508::debounceKeypad(uint8_t time, uint8_t numRows, uint8_t numCols)
 {
 	// Set up debounce time:
 	debounceTime(time);
@@ -586,7 +586,7 @@ void SX1509::debounceKeypad(uint8_t time, uint8_t numRows, uint8_t numCols)
 		debouncePin(i);
 }
 
-void SX1509::enableInterrupt(uint8_t pin, uint8_t riseFall)
+void SX1508::enableInterrupt(uint8_t pin, uint8_t riseFall)
 {
 	// Set REG_INTERRUPT_MASK
 	uint16_t tempWord = readWord(REG_INTERRUPT_MASK_B);
@@ -628,7 +628,7 @@ void SX1509::enableInterrupt(uint8_t pin, uint8_t riseFall)
 	writeWord(senseRegister, tempWord);
 }
 
-uint16_t SX1509::interruptSource(bool clear /* =true*/)
+uint16_t SX1508::interruptSource(bool clear /* =true*/)
 {
 	uint16_t intSource = readWord(REG_INTERRUPT_SOURCE_B);
 	if (clear)
@@ -636,7 +636,7 @@ uint16_t SX1509::interruptSource(bool clear /* =true*/)
 	return intSource;
 }
 
-bool SX1509::checkInterrupt(uint8_t pin)
+bool SX1508::checkInterrupt(uint8_t pin)
 {
 	if (interruptSource(false) & (1 << pin))
 		return true;
@@ -644,12 +644,12 @@ bool SX1509::checkInterrupt(uint8_t pin)
 	return false;
 }
 
-void SX1509::clock(uint8_t oscSource, uint8_t oscDivider, uint8_t oscPinFunction, uint8_t oscFreqOut)
+void SX1508::clock(uint8_t oscSource, uint8_t oscDivider, uint8_t oscPinFunction, uint8_t oscFreqOut)
 {
 	configClock(oscSource, oscPinFunction, oscFreqOut, oscDivider);
 }
 
-void SX1509::configClock(uint8_t oscSource /*= 2*/, uint8_t oscPinFunction /*= 0*/, uint8_t oscFreqOut /*= 0*/, uint8_t oscDivider /*= 1*/)
+void SX1508::configClock(uint8_t oscSource /*= 2*/, uint8_t oscPinFunction /*= 0*/, uint8_t oscFreqOut /*= 0*/, uint8_t oscDivider /*= 1*/)
 {
 	// RegClock constructed as follows:
 	//	6:5 - Oscillator frequency souce
@@ -676,7 +676,7 @@ void SX1509::configClock(uint8_t oscSource /*= 2*/, uint8_t oscPinFunction /*= 0
 	writeByte(REG_MISC, regMisc);
 }
 
-uint8_t SX1509::calculateLEDTRegister(unsigned long ms)
+uint8_t SX1508::calculateLEDTRegister(unsigned long ms)
 {
 	uint8_t regOn1, regOn2;
 	float timeOn1, timeOn2;
@@ -698,7 +698,7 @@ uint8_t SX1509::calculateLEDTRegister(unsigned long ms)
 		return regOn2;
 }
 
-uint8_t SX1509::calculateSlopeRegister(unsigned long ms, uint8_t onIntensity, uint8_t offIntensity)
+uint8_t SX1508::calculateSlopeRegister(unsigned long ms, uint8_t onIntensity, uint8_t offIntensity)
 {
 	uint16_t regSlope1, regSlope2;
 	float regTime1, regTime2;
@@ -729,11 +729,11 @@ uint8_t SX1509::calculateSlopeRegister(unsigned long ms, uint8_t onIntensity, ui
 //	- deviceAddress should already be set by the constructor.
 //	- Return value is the byte read from registerAddress
 //		- Currently returns 0 if communication has timed out
-uint8_t SX1509::readByte(uint8_t registerAddress)
+uint8_t SX1508::readByte(uint8_t registerAddress)
 {
 	uint8_t readValue;
-	// Commented the line as variable seems unused; 
-	//uint16_t timeout = RECEIVE_TIMEOUT_VALUE;
+	// Commented the line as variable seems unused;
+	// uint16_t timeout = RECEIVE_TIMEOUT_VALUE;
 
 	_i2cPort->beginTransmission(deviceAddress);
 	_i2cPort->write(registerAddress);
@@ -750,12 +750,12 @@ uint8_t SX1509::readByte(uint8_t registerAddress)
 //	- A 16-bit uint16_t will be returned.
 //		- The msb of the return value will contain the value read from registerAddress
 //		- The lsb of the return value will contain the value read from registerAddress + 1
-uint16_t SX1509::readWord(uint8_t registerAddress)
+uint16_t SX1508::readWord(uint8_t registerAddress)
 {
 	uint16_t readValue;
 	uint16_t msb, lsb;
-	// Commented the line as variable seems unused; 
-	//uint16_t timeout = RECEIVE_TIMEOUT_VALUE * 2;
+	// Commented the line as variable seems unused;
+	// uint16_t timeout = RECEIVE_TIMEOUT_VALUE * 2;
 
 	_i2cPort->beginTransmission(deviceAddress);
 	_i2cPort->write(registerAddress);
@@ -769,7 +769,7 @@ uint16_t SX1509::readWord(uint8_t registerAddress)
 	return readValue;
 }
 
-bool SX1509::readByte(uint8_t registerAddress, uint8_t *value)
+bool SX1508::readByte(uint8_t registerAddress, uint8_t *value)
 {
 	return readBytes(registerAddress, value, 1);
 }
@@ -780,7 +780,7 @@ bool SX1509::readByte(uint8_t registerAddress, uint8_t *value)
 //		- The msb of the return value will contain the value read from registerAddress
 //		- The lsb of the return value will contain the value read from registerAddress + 1
 //	- Return boolean true if succesfull
-bool SX1509::readWord(uint8_t registerAddress, uint16_t *value)
+bool SX1508::readWord(uint8_t registerAddress, uint16_t *value)
 {
 	uint8_t dest[2];
 	if (readBytes(registerAddress, dest, 2))
@@ -798,7 +798,7 @@ bool SX1509::readWord(uint8_t registerAddress, uint16_t *value)
 //	- destination is an array of bytes where the read values will be stored into
 //	- length is the number of bytes to be read
 //	- Return boolean true if succesfull
-bool SX1509::readBytes(uint8_t firstRegisterAddress, uint8_t *destination, uint8_t length)
+bool SX1508::readBytes(uint8_t firstRegisterAddress, uint8_t *destination, uint8_t length)
 {
 	_i2cPort->beginTransmission(deviceAddress);
 	_i2cPort->write(firstRegisterAddress);
@@ -820,7 +820,7 @@ bool SX1509::readBytes(uint8_t firstRegisterAddress, uint8_t *destination, uint8
 //	- writeValue is written to registerAddress
 //	- deviceAddres should already be set from the constructor
 //	- Return value: true if succeeded, false if failed
-bool SX1509::writeByte(uint8_t registerAddress, uint8_t writeValue)
+bool SX1508::writeByte(uint8_t registerAddress, uint8_t writeValue)
 {
 	_i2cPort->beginTransmission(deviceAddress);
 	bool result = _i2cPort->write(registerAddress) && _i2cPort->write(writeValue);
@@ -833,7 +833,7 @@ bool SX1509::writeByte(uint8_t registerAddress, uint8_t writeValue)
 //	- the upper byte of writeValue is written to registerAddress
 //		- the lower byte of writeValue is written to registerAddress + 1
 //	- Return value: true if succeeded, false if failed
-bool SX1509::writeWord(uint8_t registerAddress, uint16_t writeValue)
+bool SX1508::writeWord(uint8_t registerAddress, uint16_t writeValue)
 {
 	uint8_t msb, lsb;
 	msb = ((writeValue & 0xFF00) >> 8);
@@ -851,7 +851,7 @@ bool SX1509::writeWord(uint8_t registerAddress, uint16_t writeValue)
 //	- writeArray should be an array of byte values to be written.
 //	- length should be the number of bytes to be written.
 //	- Return value: true if succeeded, false if failed
-bool SX1509::writeBytes(uint8_t firstRegisterAddress, uint8_t *writeArray, uint8_t length)
+bool SX1508::writeBytes(uint8_t firstRegisterAddress, uint8_t *writeArray, uint8_t length)
 {
 	_i2cPort->beginTransmission(deviceAddress);
 	bool result = _i2cPort->write(firstRegisterAddress);

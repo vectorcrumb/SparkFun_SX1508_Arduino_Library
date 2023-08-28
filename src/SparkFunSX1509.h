@@ -1,20 +1,20 @@
 /******************************************************************************
-SparkFunSX1509.h
-SparkFun SX1509 I/O Expander Library Header File
+SparkFunSX1508.h
+SparkFun SX1508 I/O Expander Library Header File
 Jim Lindblom @ SparkFun Electronics
 Original Creation Date: September 21, 2015
 https://github.com/sparkfun/SparkFun_SX1509_Arduino_Library
 
-Here you'll find the Arduino code used to interface with the SX1509 I2C
-16 I/O expander. There are functions to take advantage of everything the
-SX1509 provides - input/output setting, writing pins high/low, reading 
+Here you'll find the Arduino code used to interface with the SX1508 I2C
+8 I/O expander. There are functions to take advantage of everything the
+SX1508 provides - input/output setting, writing pins high/low, reading
 the input value of pins, LED driver utilities (blink, breath, pwm), and
 keypad engine utilites.
 
 Development environment specifics:
 	IDE: Arduino 1.6.5
 	Hardware Platform: Arduino Uno
-	SX1509 Breakout Version: v2.0
+	SX1508 Breakout Version: v1.0
 
 This code is beerware; if you see me (or any other SparkFun employee) at the
 local, and you've found our code helpful, please buy us a round!
@@ -24,8 +24,8 @@ Distributed as-is; no warranty is given.
 
 #include "Arduino.h"
 
-#ifndef SparkFunSX1509_H
-#define SparkFunSX1509_H
+#ifndef SparkFunSX1508_H
+#define SparkFunSX1508_H
 
 #ifndef I2C_ERROR_OK
 #define I2C_ERROR_OK 0
@@ -46,13 +46,13 @@ Distributed as-is; no warranty is given.
 
 #define ANALOG_OUTPUT 0x3 // To set a pin mode for PWM output
 
-class SX1509
+class SX1508
 {
 private: // These private functions are not available to Arduino sketches.
 		 // If you need to read or write directly to registers, consider
 		 // putting the writeByte, readByte functions in the public section
 	TwoWire *_i2cPort;
-	uint8_t deviceAddress; // I2C Address of SX1509
+	uint8_t deviceAddress; // I2C Address of SX1508
 						   // Pin definitions:
 	uint8_t pinInterrupt;
 	uint8_t pinOscillator;
@@ -82,32 +82,32 @@ private: // These private functions are not available to Arduino sketches.
 
 public:
 	// -----------------------------------------------------------------------------
-	// Constructor - SX1509: This function sets up the pins connected to the
-	//		SX1509, and sets up the private deviceAddress variable.
+	// Constructor - SX1508: This function sets up the pins connected to the
+	//		SX1508, and sets up the private deviceAddress variable.
 	// -----------------------------------------------------------------------------
-	SX1509();
+	SX1508();
 	// Legacy below. Use 0-parameter constructor, and set these parameters in the
 	// begin function:
-	SX1509(uint8_t address, uint8_t resetPin = 255, uint8_t interruptPin = 255, uint8_t oscillatorPin = 255);
+	SX1508(uint8_t address, uint8_t resetPin = 255, uint8_t interruptPin = 255, uint8_t oscillatorPin = 255);
 
 	// -----------------------------------------------------------------------------
-	// begin(uint8_t address, uint8_t resetPin): This function initializes the SX1509.
+	// begin(uint8_t address, uint8_t resetPin): This function initializes the SX1508.
 	//  	It requires wire to already be begun (previous versions did not do this), resets the IC, and tries to read some
 	//  	registers to prove it's connected.
 	// Inputs:
-	//		- address: should be the 7-bit address of the SX1509. This should be
+	//		- address: should be the 7-bit address of the SX1508. This should be
 	//		 one of four values - 0x3E, 0x3F, 0x70, 0x71 - all depending on what the
 	//		 ADDR0 and ADDR1 pins ar se to. This variable is required.
-	//		- resetPin: This is the Arduino pin tied to the SX1509 RST pin. This
+	//		- resetPin: This is the Arduino pin tied to the SX1508 RST pin. This
 	//		 pin is optional. If not declared, the library will attempt to
-	//		 software reset the SX1509.
+	//		 software reset the SX1508.
 	// Output: Returns a 1 if communication is successful, 0 on error.
 	// -----------------------------------------------------------------------------
 	uint8_t begin(uint8_t address = 0x3E, TwoWire &wirePort = Wire, uint8_t resetPin = 0xFF);
 	uint8_t init(void); // Legacy -- use begin now
 
 	// -----------------------------------------------------------------------------
-	// reset(bool hardware): This function resets the SX1509 - either a hardware
+	// reset(bool hardware): This function resets the SX1508 - either a hardware
 	//		reset or software. A hardware reset (hardware parameter = 1) pulls the
 	//		reset line low, pausing, then pulling the reset line high. A software
 	//		reset writes a 0x12 then 0x34 to the REG_RESET as outlined in the
@@ -119,7 +119,7 @@ public:
 	void reset(bool hardware);
 
 	// -----------------------------------------------------------------------------
-	// pinMode(uint8_t pin, uint8_t inOut): This function sets one of the SX1509's 16
+	// pinMode(uint8_t pin, uint8_t inOut): This function sets one of the SX1508's 16
 	//		outputs to either an INPUT or OUTPUT.
 	//
 	//	Inputs:
@@ -137,7 +137,7 @@ public:
 	//		resistor (HIGH or LOW respectively).
 	//
 	//	Inputs:
-	//		- pin: The SX1509 pin number. Should be a value between 0 and 15.
+	//		- pin: The SX1508 pin number. Should be a value between 0 and 7.
 	//		- highLow: should be Arduino's defined HIGH or LOW constants.
 	// -----------------------------------------------------------------------------
 	bool digitalWrite(uint8_t pin, uint8_t highLow);
@@ -148,7 +148,7 @@ public:
 	//		The pin should be configured as an INPUT, using the pinDir function.
 	//
 	//	Inputs:
-	//	 	- pin: The SX1509 pin to be read. should be a value between 0 and 15.
+	//	 	- pin: The SX1508 pin to be read. should be a value between 0 and 7.
 	//  Outputs:
 	//		This function returns a 1 if HIGH, 0 if LOW
 	// -----------------------------------------------------------------------------
@@ -163,7 +163,7 @@ public:
 	//		functions on that pin.
 	//
 	//	Inputs:
-	//		- pin: The SX1509 pin connected to an LED. Should be 0-15.
+	//		- pin: The SX1508 pin connected to an LED. Should be 0-7.
 	//   	- freq: Sets LED clock frequency divider.
 	//		- log: selects either linear or logarithmic mode on the LED drivers
 	//			- log defaults to 0, linear mode
@@ -177,7 +177,7 @@ public:
 	//		of an output pin connected to an LED.
 	//
 	//	Inputs:
-	//		- pin: The SX1509 pin connecte to an LED.Should be 0-15.
+	//		- pin: The SX1508 pin connecte to an LED.Should be 0-7.
 	//		- iOn: should be a 0-255 value setting the intensity of the LED
 	//			- 0 is completely off, 255 is 100% on.
 	//
@@ -191,7 +191,7 @@ public:
 	//		tFall):  blink performs both the blink and breath LED driver functions.
 	//
 	// 	Inputs:
-	//  	- pin: the SX1509 pin (0-15) you want to set blinking/breathing.
+	//  	- pin: the SX1508 pin (0-7) you want to set blinking/breathing.
 	//		- tOn: the amount of time the pin is HIGH
 	//			- This value should be between 1 and 31. 0 is off.
 	//		- tOff: the amount of time the pin is at offIntensity
@@ -206,8 +206,8 @@ public:
 	//		- tFall: This sets the time the LED takes to fade out.
 	//			- This value should be between 1 and 31. 0 is off.
 	// 	 Notes:
-	//		- The breathable pins are 4, 5, 6, 7, 12, 13, 14, 15 only. If tRise and
-	//			tFall are set on 0-3 or 8-11 those pins will still only blink.
+	//		- The breathable pins are ? only. If tRise and
+	//			tFall are set on ? or ? those pins will still only blink.
 	// 		- ledDriverInit should be called on the pin to be blinked before this.
 	// -----------------------------------------------------------------------------
 	void setupBlink(uint8_t pin, uint8_t tOn, uint8_t toff, uint8_t onIntensity = 255, uint8_t offIntensity = 0, uint8_t tRise = 0, uint8_t tFall = 0, bool log = false);
@@ -217,14 +217,14 @@ public:
 	//  	Set a pin to blink output for estimated on/off millisecond durations.
 	//
 	// 	Inputs:
-	//  	- pin: the SX1509 pin (0-15) you want to set blinking
+	//  	- pin: the SX1508 pin (0-7) you want to set blinking
 	//   	- tOn: estimated number of milliseconds the pin is LOW (LED sinking current will be on)
 	//   	- tOff: estimated number of milliseconds the pin is HIGH (LED sinking current will be off)
 	//   	- onIntensity: 0-255 value determining LED on brightness
 	//   	- offIntensity: 0-255 value determining LED off brightness
 	// 	 Notes:
-	//		- The breathable pins are 4, 5, 6, 7, 12, 13, 14, 15 only. If tRise and
-	//			tFall are set on 0-3 or 8-11 those pins will still only blink.
+	//		- The breathable pins are ? only. If tRise and
+	//			tFall are set on ? or ? those pins will still only blink.
 	// 		- ledDriverInit should be called on the pin to be blinked before this.
 	// -----------------------------------------------------------------------------
 	void blink(uint8_t pin, unsigned long tOn, unsigned long tOff, uint8_t onIntensity = 255, uint8_t offIntensity = 0);
@@ -235,7 +235,7 @@ public:
 	//  	estimated rise and fall durations.
 	//
 	// 	Inputs:
-	//  	- pin: the SX1509 pin (0-15) you want to set blinking
+	//  	- pin: the SX1508 pin (0-7) you want to set blinking
 	//   	- tOn: estimated number of milliseconds the pin is LOW (LED sinking current will be on)
 	//   	- tOff: estimated number of milliseconds the pin is HIGH (LED sinking current will be off)
 	//   	- rise: estimated number of milliseconds the pin rises from LOW to HIGH
@@ -243,8 +243,8 @@ public:
 	//   	- onIntensity: 0-255 value determining LED on brightness
 	//   	- offIntensity: 0-255 value determining LED off brightness
 	// 	 Notes:
-	//		- The breathable pins are 4, 5, 6, 7, 12, 13, 14, 15 only. If tRise and
-	//			tFall are set on 0-3 or 8-11 those pins will still only blink.
+	//		- The breathable pins are ? only. If tRise and
+	//			tFall are set on ? or ? those pins will still only blink.
 	// 		- ledDriverInit should be called on the pin to be blinked before this,
 	//  	  Or call pinMode(<pin>, ANALOG_OUTPUT);
 	// -----------------------------------------------------------------------------
@@ -252,7 +252,7 @@ public:
 
 	// -----------------------------------------------------------------------------
 	// keypad(uint8_t rows, uint8_t columns, uint8_t sleepTime, uint8_t scanTime, uint8_t debounceTime)
-	//		Initializes the keypad function on the SX1509. Millisecond durations for sleep,
+	//		Initializes the keypad function on the SX1508. Millisecond durations for sleep,
 	//		scan, and debounce can be set.
 	//
 	//	Inputs:
@@ -357,10 +357,10 @@ public:
 	void debounceTime(uint8_t time);
 
 	// -----------------------------------------------------------------------------
-	// debouncePin(uint8_t pin): This method enables debounce on SX1509 input pin.
+	// debouncePin(uint8_t pin): This method enables debounce on SX1508 input pin.
 	//
 	//	Input:
-	//		- pin: The SX1509 pin to be debounced. Should be between 0 and 15.
+	//		- pin: The SX1508 pin to be debounced. Should be between 0 and 7.
 	// -----------------------------------------------------------------------------
 	void debouncePin(uint8_t pin);
 	void debounceEnable(uint8_t pin); // Legacy, use debouncePin
@@ -378,11 +378,11 @@ public:
 
 	// -----------------------------------------------------------------------------
 	// enableInterrupt(uint8_t pin, uint8_t riseFall): This function sets up an interrupt
-	//		on a pin. Interrupts can occur on all SX1509 pins, and can be generated
+	//		on a pin. Interrupts can occur on all SX1508 pins, and can be generated
 	//		on rising, falling, or both.
 	//
 	//	Inputs:
-	//		-pin: SX1509 input pin that will generate an input. Should be 0-15.
+	//		-pin: SX1508 input pin that will generate an input. Should be 0-7.
 	//		-riseFall: Configures if you want an interrupt generated on rise fall or
 	//			both. For this param, send the pin-change values previously defined
 	//			by Arduino:
@@ -453,6 +453,6 @@ public:
 };
 
 // Add backwards compatibility for the old class name: sx1509Class
-typedef SX1509 sx1509Class;
+typedef SX1508 sx1508Class;
 
-#endif // SX1509_library_H
+#endif // SX1508_library_H
